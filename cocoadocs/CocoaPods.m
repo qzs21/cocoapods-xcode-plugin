@@ -44,6 +44,7 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 
 @interface CocoaPods () <NSTextFieldDelegate>
 
+@property (nonatomic, strong) NSMenuItem *updatePodsNoRepoUpdateItem;
 @property (nonatomic, strong) NSMenuItem *installPodsItem;
 @property (nonatomic, strong) NSMenuItem *outdatedPodsItem;
 @property (nonatomic, strong) NSMenuItem *updatePodsItem;
@@ -83,7 +84,7 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-	if ([menuItem isEqual:self.installPodsItem] || [menuItem isEqual:self.outdatedPodsItem] || [menuItem isEqual:self.updatePodsItem]) {
+    if ([menuItem isEqual:self.installPodsItem] || [menuItem isEqual:self.outdatedPodsItem] || [menuItem isEqual:self.updatePodsItem] || [menuItem isEqual:self.updatePodsNoRepoUpdateItem] ) {
         return [[CCPProject projectForKeyWindow] hasPodfile];
 	}
     
@@ -101,6 +102,10 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 		                                                  action:@selector(toggleInstallDocsForPods)
 		                                           keyEquivalent:@""];
 		self.installDocsItem.state = [self shouldInstallDocsForPods] ? NSOnState : NSOffState;
+        
+        self.updatePodsNoRepoUpdateItem = [[NSMenuItem alloc] initWithTitle:@"Update Pods [--no-repo-update]"
+                                                                     action:@selector(updatePodsNoRepoUpdate)
+                                                              keyEquivalent:@""];
         
 		self.installPodsItem = [[NSMenuItem alloc] initWithTitle:@"Install Pods"
 		                                                  action:@selector(integratePods)
@@ -132,7 +137,7 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
         }
         [self.pathItem setView:self.pathView];
 
-        
+        [self.updatePodsNoRepoUpdateItem setTarget:self];
 		[self.installDocsItem setTarget:self];
 		[self.installPodsItem setTarget:self];
 		[self.outdatedPodsItem setTarget:self];
@@ -141,6 +146,7 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 		[createPodspecItem setTarget:self];
         [self.pathItem setTarget:self];
         
+        [[cocoaPodsMenu submenu] addItem:self.updatePodsNoRepoUpdateItem];
 		[[cocoaPodsMenu submenu] addItem:self.installPodsItem];
 		[[cocoaPodsMenu submenu] addItem:self.outdatedPodsItem];
 		[[cocoaPodsMenu submenu] addItem:self.updatePodsItem];
@@ -326,6 +332,14 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 	                        withArgs:@[@"install", @"cocoapods"]
 	                       directory:[CCPWorkspaceManager currentWorkspaceDirectoryPath]
 	                      completion:nil];
+}
+
+- (void)updatePodsNoRepoUpdate
+{
+    [CCPShellHandler runShellCommand:[[self gemPath]stringByAppendingPathComponent:POD_EXECUTABLE]
+                            withArgs:@[@"update", @"--no-repo-update"]
+                           directory:[CCPWorkspaceManager currentWorkspaceDirectoryPath]
+                          completion:nil];
 }
 
 - (void)installOrUpdateDocSetsForPods
