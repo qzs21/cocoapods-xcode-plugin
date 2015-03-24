@@ -103,7 +103,7 @@ static NSString *GEM_PATH_KEY = @"GEM_PATH_KEY";
 		                                           keyEquivalent:@""];
 		self.installDocsItem.state = [self shouldInstallDocsForPods] ? NSOnState : NSOffState;
         
-        self.updatePodsNoRepoUpdateItem = [[NSMenuItem alloc] initWithTitle:@"Update Pods [--no-repo-update]"
+        self.updatePodsNoRepoUpdateItem = [[NSMenuItem alloc] initWithTitle:@"Update Pods (Offline only)"
                                                                      action:@selector(updatePodsNoRepoUpdate)
                                                               keyEquivalent:@""];
         
